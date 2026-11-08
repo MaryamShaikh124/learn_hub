@@ -39,7 +39,9 @@ function Header() {
     <Link to="/" className="brand"><span className="brand-mark"><GraduationCap size={21} /></span><span>learn<span>hub</span></span></Link>
     <button className="mobile-menu-toggle" aria-label={mobileOpen ? 'Close menu' : 'Open menu'} onClick={() => setMobileOpen(!mobileOpen)}>{mobileOpen ? <X /> : <Menu />}</button>
     <nav className={`main-nav ${mobileOpen ? 'open' : ''}`}>
+      <NavLink to="/" end>Home</NavLink>
       <NavLink to="/courses">Explore</NavLink>
+      <NavLink to="/about">About</NavLink>
       {user && <NavLink to={homeLink}>Dashboard</NavLink>}
       {user?.role === 'instructor' && <NavLink to="/instructor/courses">My courses</NavLink>}
       {user?.role === 'admin' && <NavLink to="/admin/users">Users</NavLink>}
@@ -52,7 +54,7 @@ function Header() {
 }
 
 function Footer() {
-  return <footer className="site-footer"><div className="footer-inner"><Link to="/" className="brand"><span className="brand-mark"><GraduationCap size={21} /></span><span>learn<span>hub</span></span></Link><p>Skills for the work and life you want.</p><span>© {new Date().getFullYear()} LearnHub</span></div></footer>;
+  return <footer className="site-footer"><div className="footer-inner"><Link to="/" className="brand"><span className="brand-mark"><GraduationCap size={21} /></span><span>learn<span>hub</span></span></Link><p>Skills for the work and life you want.</p><Link className="footer-about-link" to="/about">About LearnHub</Link><span>© {new Date().getFullYear()} LearnHub</span></div></footer>;
 }
 
 export function SiteLayout() {

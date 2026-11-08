@@ -77,6 +77,8 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .footer-inner .brand { font-size: 16px; }
 .footer-inner .brand-mark { width: 29px; height: 29px; border-radius: 9px; }
 .footer-inner p, .footer-inner > span { margin: 0; color: #85869a; font-size: 11px; }
+.footer-about-link { color: #777991; font-size: 11px; font-weight: 600; }
+.footer-about-link:hover { color: var(--purple); }
 .footer-inner > span { margin-left: auto; }
 
 .hero-section { position: relative; min-height: 626px; max-width: 1440px; margin: 0 auto; padding: 86px max(6.5vw, 42px) 70px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(420px, .94fr); align-items: center; gap: 35px; overflow: hidden; background: #f6f5ff; }
@@ -191,6 +193,26 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .bottom-cta h2 { margin-bottom: 11px; font-size: 42px; }
 .bottom-cta > p { margin-bottom: 23px; color: #777991; font-size: 12px; }
 .cta-spark { position: absolute; top: 50px; right: 22%; color: #e8a96d; font-size: 36px; }
+
+.about-page { display: grid; gap: 62px; }
+.about-hero { padding: clamp(32px,6vw,72px); border-radius: 20px; background: linear-gradient(130deg,#f0efff,#fbfaff 65%,#e6f4ee); }
+.about-hero h1 { max-width: 700px; margin: 17px 0 14px; font-size: clamp(38px,6vw,64px); line-height: 1.08; }
+.about-hero h1 em { color: var(--purple); font-style: normal; }
+.about-hero > p { max-width: 650px; margin-bottom: 23px; color: #74758d; font-size: 15px; line-height: 1.8; }
+.about-story { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(220px,.7fr); align-items: center; gap: 50px; }
+.about-story h2, .about-section-heading h2, .about-cta h2 { margin: 10px 0 14px; font-size: clamp(24px,3vw,34px); line-height: 1.2; }
+.about-story p { color: #777991; font-size: 13px; line-height: 1.8; }
+.about-story-art { min-height: 240px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 18px; color: #5143be; background: #eeedff; }
+.about-story-art > span { width: 76px; height: 76px; display: grid; place-items: center; border-radius: 24px; color: white; background: var(--purple); transform: rotate(-7deg); }
+.about-story-art b { font-family: Manrope,sans-serif; font-size: 27px; line-height: 1.2; letter-spacing: -.05em; }
+.about-section-heading { margin-bottom: 22px; }
+.about-value-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; }
+.about-value-grid article { padding: 22px; border: 1px solid var(--border); border-radius: 14px; background: white; }
+.about-value-grid article > span { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 12px; color: var(--purple); background: #f0efff; }
+.about-value-grid h3 { margin: 14px 0 7px; font-size: 16px; }
+.about-value-grid p { margin: 0; color: #777991; font-size: 12px; line-height: 1.7; }
+.about-cta { padding: 25px 28px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-radius: 15px; background: white; }
+.about-cta h2 { margin-bottom: 0; font-size: 23px; }
 
 .content-page { max-width: 1190px; margin: 0 auto; padding: 55px 32px 95px; }
 .page-heading { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 34px; }
@@ -596,6 +618,7 @@ td b { color: #464862; font-size: 9px; }
   .footer-inner .brand { font-size: 14px; }
   .footer-inner .brand-mark { width: 26px; height: 26px; }
   .footer-inner p { display: none; }
+  .footer-about-link { font-size: 9px; }
   .footer-inner > span { font-size: 9px; }
   .site-main { min-height: calc(100vh - 128px); }
   .hero-section { min-height: unset; padding: 62px 24px 57px; display: flex; flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -639,6 +662,14 @@ td b { color: #464862; font-size: 9px; }
   .bottom-cta { min-height: 320px; padding: 50px 20px; }
   .bottom-cta h2 { font-size: 36px; }
   .content-page { padding: 35px 18px 65px; }
+  .about-page { gap: 39px; }
+  .about-hero { padding: 30px 22px; }
+  .about-hero > p { font-size: 13px; }
+  .about-story { grid-template-columns: 1fr; gap: 13px; }
+  .about-story-art { min-height: 180px; }
+  .about-value-grid { grid-template-columns: 1fr; gap: 10px; }
+  .about-value-grid article { padding: 16px; }
+  .about-cta { align-items: flex-start; flex-direction: column; padding: 20px; }
   .page-heading { align-items: flex-start; flex-direction: column; gap: 16px; margin-bottom: 25px; }
   .page-heading h1 { font-size: 34px; }
   .page-heading p { font-size: 11px; }

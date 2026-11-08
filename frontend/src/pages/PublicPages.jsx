@@ -31,6 +31,35 @@ export function HomePage() {
   </div>;
 }
 
+export function AboutPage() {
+  return <div className="content-page about-page">
+    <section className="about-hero">
+      <span className="eyebrow"><Sparkles size={14} /> ABOUT LEARNHUB</span>
+      <h1>Make learning fit <em>your life.</em></h1>
+      <p>LearnHub brings learners and instructors together around practical skills, thoughtful courses, and progress you can make at your own pace.</p>
+      <Link to="/courses" className="button button-primary">Explore courses <ArrowRight size={16} /></Link>
+    </section>
+    <section className="about-story">
+      <div>
+        <span className="eyebrow">WHY WE’RE HERE</span>
+        <h2>Every next step starts with a little curiosity.</h2>
+        <p>Finding time and a clear path to learn something new can be a challenge. LearnHub makes it easier to discover useful courses, learn from instructors, and keep your progress in one place.</p>
+        <p>Whether you’re exploring a new interest or building a skill for work, learning should feel welcoming, practical, and yours to shape.</p>
+      </div>
+      <div className="about-story-art" aria-hidden="true"><span><GraduationCap size={48} /></span><b>Learn a little.<br />Grow a lot.</b></div>
+    </section>
+    <section className="about-values">
+      <div className="about-section-heading"><span className="eyebrow">WHAT MATTERS TO US</span><h2>A better way to keep growing.</h2></div>
+      <div className="about-value-grid">
+        <article><span><BookOpen size={20} /></span><h3>Practical learning</h3><p>Focused courses help you build skills you can put to use.</p></article>
+        <article><span><Heart size={20} /></span><h3>Learn at your pace</h3><p>Make room for learning in a way that works for your schedule.</p></article>
+        <article><span><Users size={20} /></span><h3>People who teach</h3><p>Learn from instructors who share their knowledge and experience.</p></article>
+      </div>
+    </section>
+    <section className="about-cta"><div><span className="eyebrow">READY WHEN YOU ARE</span><h2>Your next skill could start today.</h2></div><Link to="/courses" className="button button-primary">Find a course <ArrowRight size={16} /></Link></section>
+  </div>;
+}
+
 export function CoursesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [result, setResult] = useState({ courses: [], page: 1, pages: 1, total: 0 });

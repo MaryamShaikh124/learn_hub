@@ -17,7 +17,7 @@ import {
   ProfilePage,
   StudentDashboardPage,
 } from './pages/DashboardPages';
-import { AuthPage, CourseDetailPage, CoursesPage, HomePage } from './pages/PublicPages';
+import { AboutPage, AuthPage, CourseDetailPage, CoursesPage, HomePage } from './pages/PublicPages';
 import LearningPage from './pages/LearningPage';
 
 function RoleLanding() {
@@ -30,6 +30,7 @@ export default function App() {
   return <Routes>
     <Route element={<SiteLayout />}>
       <Route index element={<HomePage />} />
+      <Route path="about" element={<AboutPage />} />
       <Route path="courses" element={<CoursesPage />} />
       <Route path="courses/:id" element={<CourseDetailPage />} />
       <Route path="login" element={<AuthPage mode="login" />} />
