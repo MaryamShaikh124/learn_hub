@@ -1,10 +1,11 @@
 # LearnHub
 
-LearnHub is a React and Express learning platform scaffold with student, instructor, and administrator workflows. The API uses MongoDB/Mongoose and JWT authentication.
+LearnHub is a React and Express learning platform with public course discovery and student, instructor, and administrator workflows. The frontend is a Vite single-page application, and the API uses MongoDB/Mongoose and JWT authentication.
 
 ## What is included
 
 - Public course discovery with category, price, search, sort, and pagination filters.
+- Public Home and About pages, shared navigation, and responsive layouts.
 - Student registration/login, profile/password settings, enrollments, lesson progress, certificates, and course reviews.
 - Instructor course and lesson management, student lists, and database-backed analytics.
 - Admin overview, user/role management, instructor account creation, and course oversight.
@@ -13,8 +14,9 @@ LearnHub is a React and Express learning platform scaffold with student, instruc
 
 ## Requirements
 
-- Node.js 18 or newer.
+- Node.js 20.19+ or 22.12+ (required by the Vite 7 frontend; the API itself requires Node.js 18+).
 - MongoDB (a local server or MongoDB Atlas). During development, the API can start an ephemeral in-memory MongoDB instance if `MONGODB_URI` is omitted. Data in that fallback is discarded when the API stops.
+- npm.
 
 ## Local setup
 
@@ -23,7 +25,7 @@ LearnHub is a React and Express learning platform scaffold with student, instruc
    ```powershell
    cd backend
    Copy-Item .env.example .env
-   npm install
+   npm ci
    ```
 
    Set a unique `JWT_SECRET`. For persistent local data, set `MONGODB_URI` to your MongoDB connection string. Leave it empty only when you want the temporary in-memory development database.
@@ -49,11 +51,11 @@ LearnHub is a React and Express learning platform scaffold with student, instruc
    ```powershell
    cd frontend
    Copy-Item .env.example .env
-   npm install
+   npm ci
    npm run dev
    ```
 
-   The Vite development server is normally available at `http://localhost:5173`.
+   The Vite development server is normally available at `http://localhost:5173`. Set `VITE_API_URL` in `frontend/.env` to override the API base URL; its default is `http://localhost:5000/api`.
 
 ## Checks
 
@@ -73,7 +75,7 @@ npm test
 
 ## Course pricing
 
-Paid courses use an explicitly simulated checkout. Completing it creates a simulated payment record and enrolls the student, but no payment provider is connected, no payment details are collected, and no money is charged. Students can view their demo payment records; administrators can review all simulated transactions. These records are not real payments or revenue.
+Paid courses use an in-app simulated checkout. Completing it creates a payment record and enrolls the student. The project does not connect to a payment provider, collect payment details, or charge money; payment records are not real payments or revenue.
 
 ## Deployment
 
@@ -89,8 +91,3 @@ Deploy the `frontend` directory as the Vercel project root. Vercel uses `fronten
 
 Create a database user with a strong password, restrict network access to the deployment environment where possible, and set the resulting URI as `MONGODB_URI`. Do not commit `.env` files or real credentials.
 
-## Current limitations
-
-- Video hosting is external: instructors provide YouTube/Vimeo URLs; LearnHub does not upload or transcode video files.
-- The in-memory MongoDB fallback is for local development only and resets on process shutdown.
-- Paid course checkout is currently simulated. Connect a payment provider and verify its server-side payment result before treating an order as paid or granting real-world value.
