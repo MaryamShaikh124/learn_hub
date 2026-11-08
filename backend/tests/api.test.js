@@ -301,7 +301,12 @@ test('simulated checkout saves payment history and grants course access', async 
     await model.collection.createIndex({ course: 1 }, { unique: true, name: 'legacy_course_unique' });
     await model.collection.createIndex({ student: 1 }, { unique: true, name: 'legacy_student_unique' });
   }
+  await Payment.collection.createIndex({ orderId: 1 }, { unique: true, name: 'orderId_1' });
   await removeLegacyRelationshipUniqueIndexes();
+  assert.equal(
+    (await Payment.collection.indexes()).some((index) => index.name === 'orderId_1'),
+    false
+  );
 
   const learnerLogin = await request(app)
     .post('/api/auth/login')

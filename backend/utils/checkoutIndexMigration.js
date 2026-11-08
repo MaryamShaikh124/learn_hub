@@ -20,7 +20,14 @@ async function removeLegacyRelationshipUniqueIndexes() {
         keys.every((key) => key === 'student' || key === 'course')
       );
     };
-    const legacyIndexes = indexes.filter((index) => index.unique && isSingleRelationshipIndex(index));
+    const obsoletePaymentIndex = (index) =>
+      model === Payment &&
+      index.unique &&
+      Object.keys(index.key).length === 1 &&
+      ['orderId', 'tracker'].includes(Object.keys(index.key)[0]);
+    const legacyIndexes = indexes.filter(
+      (index) => index.unique && isSingleRelationshipIndex(index) || obsoletePaymentIndex(index)
+    );
 
     for (const index of legacyIndexes) {
       try {
@@ -32,7 +39,7 @@ async function removeLegacyRelationshipUniqueIndexes() {
       }
     }
 
-    if (legacyIndexes.length) {
+    if (legacyIndexes.some(isSingleRelationshipIndex)) {
       const currentIndexes = await model.collection.indexes();
       for (const field of ['student', 'course']) {
         const hasIndex = currentIndexes.some((index) => {
