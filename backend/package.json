@@ -14,6 +14,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@vercel/node": "^5.10.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
