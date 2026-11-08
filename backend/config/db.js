@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const { removeLegacyCourseUniqueIndexes } = require('../utils/checkoutIndexMigration');
 
 let memoryServer;
 let connectionPromise = null;
@@ -29,6 +30,8 @@ async function connectDB() {
       await mongoose.connect(uri, {
         serverSelectionTimeoutMS: 10000
       });
+
+      await removeLegacyCourseUniqueIndexes();
 
       console.log('MongoDB connected.');
 

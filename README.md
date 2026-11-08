@@ -91,3 +91,4 @@ Deploy the `frontend` directory as the Vercel project root. Vercel uses `fronten
 
 Create a database user with a strong password, restrict network access to the deployment environment where possible, and set the resulting URI as `MONGODB_URI`. Do not commit `.env` files or real credentials.
 
+On database connection, the API removes obsolete unique indexes that restrict each course to one payment or enrollment, while preserving per-student uniqueness.

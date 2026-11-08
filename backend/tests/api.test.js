@@ -11,6 +11,7 @@ const User = require('../models/User');
 const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
 const Payment = require('../models/Payment');
+const { removeLegacyCourseUniqueIndexes } = require('../utils/checkoutIndexMigration');
 
 let mongo;
 
@@ -283,6 +284,19 @@ test('simulated checkout saves payment history and grants course access', async 
     instructor: instructor._id,
     published: true,
   });
+
+  await Promise.all([Payment.init(), mongoose.model('Enrollment').init()]);
+  for (const model of [Payment, mongoose.model('Enrollment')]) {
+    const indexes = await model.collection.indexes();
+    const courseIndex = indexes.find((index) => {
+      const keys = Object.keys(index.key);
+      return keys.length === 1 && index.key.course === 1;
+    });
+    if (courseIndex) await model.collection.dropIndex(courseIndex.name);
+    await model.collection.createIndex({ course: 1 }, { unique: true, name: 'legacy_course_unique' });
+  }
+  await removeLegacyCourseUniqueIndexes();
+
   const learnerLogin = await request(app)
     .post('/api/auth/login')
     .send({ email: learner.email, password: 'a-secure-password' })
@@ -301,12 +315,52 @@ test('simulated checkout saves payment history and grants course access', async 
   assert.equal(await Payment.countDocuments({ student: learner._id, course: course._id }), 1);
   assert.equal(await mongoose.model('Enrollment').countDocuments({ student: learner._id, course: course._id }), 1);
 
+  const secondLearner = await User.create({
+    name: 'Second Checkout Learner',
+    email: 'checkout.second-learner@example.test',
+    password: 'a-secure-password',
+    role: 'student',
+  });
+  const secondLearnerLogin = await request(app)
+    .post('/api/auth/login')
+    .send({ email: secondLearner.email, password: 'a-secure-password' })
+    .expect(200);
+  await request(app)
+    .post(`/api/payments/checkout/${course._id}`)
+    .set('Authorization', `Bearer ${secondLearnerLogin.body.data.token}`)
+    .expect(201);
+  assert.equal(await Payment.countDocuments({ course: course._id }), 2);
+  assert.equal(await mongoose.model('Enrollment').countDocuments({ course: course._id }), 2);
+
+  const secondCourse = await Course.create({
+    title: 'Checkout Product Strategy',
+    slug: 'checkout-product-strategy',
+    shortDescription: 'Plan effective product strategies.',
+    description: 'Learn practical techniques for planning product strategies.',
+    category: 'Business',
+    level: 'Intermediate',
+    price: 1200,
+    instructor: instructor._id,
+    published: true,
+  });
+  await request(app)
+    .post(`/api/payments/checkout/${secondCourse._id}`)
+    .set('Authorization', `Bearer ${learnerToken}`)
+    .expect(201);
+  assert.equal(await Payment.countDocuments({ student: learner._id }), 2);
+  assert.equal(await mongoose.model('Enrollment').countDocuments({ student: learner._id }), 2);
+  assert.equal(await Payment.countDocuments(), 3);
+  assert.equal(await mongoose.model('Enrollment').countDocuments(), 3);
+
   const learnerHistory = await request(app)
     .get('/api/payments/me')
     .set('Authorization', `Bearer ${learnerToken}`)
     .expect(200);
-  assert.equal(learnerHistory.body.data.payments.length, 1);
-  assert.equal(learnerHistory.body.data.payments[0].course.title, course.title);
+  assert.equal(learnerHistory.body.data.payments.length, 2);
+  assert.deepEqual(
+    learnerHistory.body.data.payments.map((payment) => payment.course.title).sort(),
+    [course.title, secondCourse.title].sort()
+  );
 
   const adminLogin = await request(app)
     .post('/api/auth/login')
@@ -316,7 +370,7 @@ test('simulated checkout saves payment history and grants course access', async 
     .get('/api/admin/payments')
     .set('Authorization', `Bearer ${adminLogin.body.data.token}`)
     .expect(200);
-  assert.equal(adminHistory.body.data.payments.length, 1);
+  assert.equal(adminHistory.body.data.payments.length, 3);
   assert.equal(adminHistory.body.data.realRevenue, 0);
 
   await request(app)
