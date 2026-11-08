@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/Guards';
 import {
   AdminCoursesPage,
   AdminDashboardPage,
+  AdminPaymentsPage,
   AdminUsersPage,
   CertificateDetailPage,
   CertificatesPage,
@@ -12,6 +13,7 @@ import {
   InstructorDashboardPage,
   InstructorStudentsPage,
   MyLearningPage,
+  PaymentHistoryPage,
   ProfilePage,
   StudentDashboardPage,
 } from './pages/DashboardPages';
@@ -38,6 +40,7 @@ export default function App() {
             <Route path="dashboard" element={<StudentDashboardPage />} />
             <Route path="my-learning" element={<MyLearningPage />} />
             <Route path="certificates" element={<CertificatesPage />} />
+            <Route path="payments" element={<PaymentHistoryPage />} />
             <Route path="certificates/:id" element={<CertificateDetailPage />} />
             <Route path="learn/:courseId" element={<LearningPage />} />
           </Route>
@@ -50,6 +53,7 @@ export default function App() {
             <Route path="admin" element={<AdminDashboardPage />} />
             <Route path="admin/users" element={<AdminUsersPage />} />
             <Route path="admin/courses" element={<AdminCoursesPage />} />
+            <Route path="admin/payments" element={<AdminPaymentsPage />} />
           </Route>
           <Route path="profile" element={<ProfilePage />} />
         </Route>

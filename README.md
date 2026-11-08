@@ -73,13 +73,13 @@ npm test
 
 ## Course pricing
 
-Courses can display a price, but paid enrollment is currently unavailable. Students can enroll in free courses. No payment provider, checkout, or payment status is simulated.
+Paid courses use an explicitly simulated checkout. Completing it creates a simulated payment record and enrolls the student, but no payment provider is connected, no payment details are collected, and no money is charged. Students can view their demo payment records; administrators can review all simulated transactions. These records are not real payments or revenue.
 
 ## Deployment
 
-### Render API
+### Vercel API
 
-The root `render.yaml` configures the backend service, npm install/start commands, and `/api/health` check. Provide `MONGODB_URI` and `CLIENT_URL` (your deployed frontend origin) in the Render environment. Generate a strong `JWT_SECRET` if Render did not generate one for the service.
+Deploy the `backend` directory as a Vercel project root. Set `MONGODB_URI`, `JWT_SECRET`, and `CLIENT_URL` in the backend project's environment variables.
 
 ### Vercel frontend
 
@@ -93,4 +93,4 @@ Create a database user with a strong password, restrict network access to the de
 
 - Video hosting is external: instructors provide YouTube/Vimeo URLs; LearnHub does not upload or transcode video files.
 - The in-memory MongoDB fallback is for local development only and resets on process shutdown.
-- Paid course enrollment needs a payment provider integration before paid courses can be purchased.
+- Paid course checkout is currently simulated. Connect a payment provider and verify its server-side payment result before treating an order as paid or granting real-world value.

@@ -216,6 +216,7 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .empty-state p { max-width: 370px; margin: 0 0 16px; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .alert { margin: 13px 0; padding: 12px 14px; border: 1px solid; border-radius: 10px; font-size: 11px; line-height: 1.55; }
 .alert-error { border-color: #f3d0d2; color: #9c3e48; background: #fff4f4; }
+.alert-demo { border-color: #e8d9a8; color: #795b18; background: #fff9e8; }
 .alert-success { border-color: #cce8da; color: #28795f; background: #f0fbf5; }
 .muted-copy { color: var(--muted); font-size: 11px; line-height: 1.7; }
 
@@ -251,7 +252,7 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .detail-main { min-width: 0; }
 .content-section { margin-bottom: 39px; }
 .content-section h2 { margin: 8px 0 12px; font-size: 25px; }
-.description-long { color: #777991; font-size: 12px; line-height: 1.9; white-space: pre-line; }
+.description-long { color: #777991; font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; white-space: pre-line; }
 .learning-outcomes { margin-top: 17px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
 .learning-outcomes span { display: flex; gap: 8px; align-items: flex-start; color: #5f617b; font-size: 10px; }
 .learning-outcomes svg { flex: 0 0 auto; color: var(--green); }
@@ -381,6 +382,7 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .status-pill { min-height: 23px; padding: 5px 8px; display: inline-flex; align-items: center; border-radius: 7px; color: #777991; background: #f1f1f5; font-size: 8px; font-weight: 700; white-space: nowrap; text-transform: capitalize; }
 .status-pill.completed, .status-pill.published { color: #2e7f67; background: #e6f5ee; }
 .status-pill.active { color: #6a5bd0; background: #efedff; }
+.status-pill.simulated { color: #795b18; background: #fff1c9; }
 .progress-track { width: 100%; height: 5px; overflow: hidden; border-radius: 5px; background: #efeff5; }
 .progress-track > span { height: 100%; display: block; border-radius: inherit; background: linear-gradient(90deg,#6e5ce5,#a094ef); transition: width .3s ease; }
 .learning-row-bottom { display: flex; justify-content: space-between; margin-top: 8px; color: #9293a5; font-size: 8px; }
@@ -428,11 +430,11 @@ td b { color: #464862; font-size: 9px; }
 .managed-course-meta { display: flex; align-items: center; gap: 8px; color: #898a9e; font-size: 8px; }
 .managed-course-meta .status-pill { min-height: 20px; font-size: 7px; }
 .managed-course h3 { margin: 6px 0 4px; font-size: 13px; }
-.managed-course-copy > p { margin: 0; overflow: hidden; color: #898a9d; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.managed-course-copy > p { display: -webkit-box; margin: 0; overflow: hidden; color: #898a9d; font-size: 9px; line-height: 1.5; overflow-wrap: anywhere; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .managed-course-stats { display: flex; gap: 13px; margin-top: 9px; color: #88899d; font-size: 8px; }
 .managed-course-stats span { display: inline-flex; align-items: center; gap: 4px; }
 .managed-course-stats span:last-child svg { color: #d99a32; }
-.managed-course-actions { display: flex; align-items: center; gap: 6px; }
+.managed-course-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
 .managed-course-actions .button { min-height: 34px; padding: 0 9px; font-size: 9px; }
 .danger-icon { color: #bd6068; }
 .danger-icon:hover { color: #aa343e; background: #fff1f1; }
@@ -441,6 +443,9 @@ td b { color: #464862; font-size: 9px; }
 .modal-header { min-height: 60px; padding: 13px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
 .modal-header h2 { margin: 0; font-size: 17px; }
 .modal-body { padding: 18px; overflow-y: auto; }
+.demo-checkout-summary { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 11px; }
+.demo-checkout-summary span { color: #77788c; }
+.demo-checkout-summary strong { text-align: right; }
 .stack-form { display: grid; gap: 12px; }
 .stack-form textarea { min-height: 68px; }
 .stack-form label small { color: #9b9cac; font-size: 8px; font-weight: 400; }

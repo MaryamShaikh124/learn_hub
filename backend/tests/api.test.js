@@ -10,6 +10,7 @@ const app = require('../app');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
+const Payment = require('../models/Payment');
 
 let mongo;
 
@@ -214,7 +215,7 @@ test('free enrollment tracks lesson completion and issues a certificate', async 
   assert.equal(certificates.body.data.certificates[0].course.title, course.title);
 });
 
-test('paid courses cannot be enrolled without a payment provider', async () => {
+test('paid courses can be joined with an explicitly simulated checkout', async () => {
   const registration = await request(app)
     .post('/api/auth/register')
     .send({
@@ -249,5 +250,77 @@ test('paid courses cannot be enrolled without a payment provider', async () => {
   await request(app)
     .post(`/api/payments/checkout/${course._id}`)
     .set('Authorization', `Bearer ${registration.body.data.token}`)
-    .expect(404);
+    .expect(201);
+});
+
+test('simulated checkout saves payment history and grants course access', async () => {
+  const learner = await User.create({
+    name: 'Checkout Learner',
+    email: 'checkout.learner@example.test',
+    password: 'a-secure-password',
+    role: 'student',
+  });
+  const admin = await User.create({
+    name: 'Checkout Admin',
+    email: 'checkout.admin@example.test',
+    password: 'a-secure-password',
+    role: 'admin',
+  });
+  const instructor = await User.create({
+    name: 'Checkout Instructor',
+    email: 'checkout.instructor@example.test',
+    password: 'a-secure-password',
+    role: 'instructor',
+  });
+  const course = await Course.create({
+    title: 'Checkout Experience Design',
+    slug: 'checkout-experience-design',
+    shortDescription: 'Build clear and thoughtful checkout experiences.',
+    description: 'Learn how to plan and evaluate a checkout experience with practical examples.',
+    category: 'Design',
+    level: 'Intermediate',
+    price: 1800,
+    instructor: instructor._id,
+    published: true,
+  });
+  const learnerLogin = await request(app)
+    .post('/api/auth/login')
+    .send({ email: learner.email, password: 'a-secure-password' })
+    .expect(200);
+  const learnerToken = learnerLogin.body.data.token;
+
+  const checkout = await request(app)
+    .post(`/api/payments/checkout/${course._id}`)
+    .set('Authorization', `Bearer ${learnerToken}`)
+    .expect(201);
+  assert.equal(checkout.body.data.simulated, true);
+  assert.equal(checkout.body.data.payment.status, 'simulated');
+  assert.equal(checkout.body.data.payment.method, 'demo');
+  assert.equal(checkout.body.data.payment.amount, 1800);
+  assert.match(checkout.body.data.notice, /No real payment was collected/i);
+  assert.equal(await Payment.countDocuments({ student: learner._id, course: course._id }), 1);
+  assert.equal(await mongoose.model('Enrollment').countDocuments({ student: learner._id, course: course._id }), 1);
+
+  const learnerHistory = await request(app)
+    .get('/api/payments/me')
+    .set('Authorization', `Bearer ${learnerToken}`)
+    .expect(200);
+  assert.equal(learnerHistory.body.data.payments.length, 1);
+  assert.equal(learnerHistory.body.data.payments[0].course.title, course.title);
+
+  const adminLogin = await request(app)
+    .post('/api/auth/login')
+    .send({ email: admin.email, password: 'a-secure-password' })
+    .expect(200);
+  const adminHistory = await request(app)
+    .get('/api/admin/payments')
+    .set('Authorization', `Bearer ${adminLogin.body.data.token}`)
+    .expect(200);
+  assert.equal(adminHistory.body.data.payments.length, 1);
+  assert.equal(adminHistory.body.data.realRevenue, 0);
+
+  await request(app)
+    .post(`/api/payments/checkout/${course._id}`)
+    .set('Authorization', `Bearer ${learnerToken}`)
+    .expect(409);
 });

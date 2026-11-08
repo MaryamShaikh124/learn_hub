@@ -40,6 +40,7 @@ app.use('/api/courses', require('./routes/courseRoutes'));
 app.use('/api', require('./routes/lessonRoutes'));
 app.use('/api/enrollments', require('./routes/enrollmentRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
+app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/certificates', require('./routes/certificateRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/instructor', require('./routes/instructorRoutes'));

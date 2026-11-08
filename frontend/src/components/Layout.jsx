@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, BookOpen, ChevronDown, GraduationCap, LayoutDashboard, LogOut, Menu, Search, Settings, Shield, Sparkles, Users, X } from 'lucide-react';
+import { Bell, BookOpen, ChevronDown, CreditCard, GraduationCap, LayoutDashboard, LogOut, Menu, Search, Settings, Shield, Sparkles, Users, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -60,9 +60,9 @@ export function SiteLayout() {
 }
 
 const dashboards = {
-  student: [{ to: '/dashboard', label: 'Overview', icon: LayoutDashboard }, { to: '/my-learning', label: 'My learning', icon: BookOpen }, { to: '/certificates', label: 'Certificates', icon: GraduationCap }],
+  student: [{ to: '/dashboard', label: 'Overview', icon: LayoutDashboard }, { to: '/my-learning', label: 'My learning', icon: BookOpen }, { to: '/payments', label: 'Payment records', icon: CreditCard }, { to: '/certificates', label: 'Certificates', icon: GraduationCap }],
   instructor: [{ to: '/instructor', label: 'Overview', icon: LayoutDashboard }, { to: '/instructor/courses', label: 'Courses', icon: BookOpen }, { to: '/instructor/students', label: 'Students', icon: Users }],
-  admin: [{ to: '/admin', label: 'Overview', icon: Shield }, { to: '/admin/users', label: 'User management', icon: Users }, { to: '/admin/courses', label: 'Courses', icon: BookOpen }],
+  admin: [{ to: '/admin', label: 'Overview', icon: Shield }, { to: '/admin/users', label: 'User management', icon: Users }, { to: '/admin/courses', label: 'Courses', icon: BookOpen }, { to: '/admin/payments', label: 'Demo payments', icon: CreditCard }],
 };
 
 export function DashboardLayout() {

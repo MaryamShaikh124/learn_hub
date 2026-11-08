@@ -7,7 +7,7 @@ const Notification = require('../models/Notification');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { recalculateEnrollment, issueCertificateIfComplete } = require('../utils/learning');
-const { withTransaction } = require('../utils/transaction');
+const { withTransaction, sessionOpts } = require('../utils/transaction');
 
 function presentEnrollment(enrollment) {
   const course = enrollment.course;
@@ -33,32 +33,42 @@ function presentEnrollment(enrollment) {
   };
 }
 
-async function enrollStudent({ studentId, course }) {
-  const existing = await Enrollment.findOne({ student: studentId, course: course._id });
+async function enrollStudent({ studentId, course, session = null }) {
+  const options = sessionOpts(session);
+  const existing = await Enrollment.findOne({ student: studentId, course: course._id }).setOptions(options);
   if (existing) return { enrollment: existing, created: false };
 
-  const enrollment = await Enrollment.create({
-    student: studentId,
-    course: course._id,
-    enrolledAt: new Date(),
-  });
+  const [enrollment] = await Enrollment.create(
+    [{
+      student: studentId,
+      course: course._id,
+      enrolledAt: new Date(),
+    }],
+    options
+  );
 
-  const student = await User.findById(studentId);
-  await Notification.create({
-    recipient: studentId,
-    type: 'enrollment',
-    title: 'You are enrolled',
-    message: `You joined ${course.title}. Start with the first lesson whenever you are ready.`,
-    link: `/learn/${course._id}`,
-  });
-  if (course.instructor) {
-    await Notification.create({
-      recipient: course.instructor,
+  const student = await User.findById(studentId).setOptions(options);
+  await Notification.create(
+    [{
+      recipient: studentId,
       type: 'enrollment',
-      title: 'New student enrolled',
-      message: `${student?.name || 'A student'} enrolled in ${course.title}.`,
-      link: '/instructor/students',
-    });
+      title: 'You are enrolled',
+      message: `You joined ${course.title}. Start with the first lesson whenever you are ready.`,
+      link: `/learn/${course._id}`,
+    }],
+    options
+  );
+  if (course.instructor) {
+    await Notification.create(
+      [{
+        recipient: course.instructor,
+        type: 'enrollment',
+        title: 'New student enrolled',
+        message: `${student?.name || 'A student'} enrolled in ${course.title}.`,
+        link: '/instructor/students',
+      }],
+      options
+    );
   }
   return { enrollment, created: true };
 }
