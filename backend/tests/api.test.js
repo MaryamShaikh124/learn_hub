@@ -11,7 +11,7 @@ const User = require('../models/User');
 const Course = require('../models/Course');
 const Lesson = require('../models/Lesson');
 const Payment = require('../models/Payment');
-const { removeLegacyCourseUniqueIndexes } = require('../utils/checkoutIndexMigration');
+const { removeLegacyRelationshipUniqueIndexes } = require('../utils/checkoutIndexMigration');
 
 let mongo;
 
@@ -292,10 +292,16 @@ test('simulated checkout saves payment history and grants course access', async 
       const keys = Object.keys(index.key);
       return keys.length === 1 && index.key.course === 1;
     });
+    const studentIndex = indexes.find((index) => {
+      const keys = Object.keys(index.key);
+      return keys.length === 1 && index.key.student === 1;
+    });
     if (courseIndex) await model.collection.dropIndex(courseIndex.name);
+    if (studentIndex) await model.collection.dropIndex(studentIndex.name);
     await model.collection.createIndex({ course: 1 }, { unique: true, name: 'legacy_course_unique' });
+    await model.collection.createIndex({ student: 1 }, { unique: true, name: 'legacy_student_unique' });
   }
-  await removeLegacyCourseUniqueIndexes();
+  await removeLegacyRelationshipUniqueIndexes();
 
   const learnerLogin = await request(app)
     .post('/api/auth/login')

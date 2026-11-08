@@ -1,7 +1,7 @@
 const Payment = require('../models/Payment');
 const Enrollment = require('../models/Enrollment');
 
-async function removeLegacyCourseUniqueIndexes() {
+async function removeLegacyRelationshipUniqueIndexes() {
   for (const model of [Payment, Enrollment]) {
     const collectionName = model.collection.collectionName;
     const collections = await model.db.db
@@ -10,11 +10,17 @@ async function removeLegacyCourseUniqueIndexes() {
     if (!collections.length) continue;
 
     const indexes = await model.collection.indexes();
-    const isCourseOnlyIndex = (index) => {
+    const isSingleRelationshipIndex = (index) => {
       const keys = Object.keys(index.key);
-      return keys.length === 1 && index.key.course === 1;
+      const hasStudent = keys.includes('student');
+      const hasCourse = keys.includes('course');
+      return (
+        (hasStudent || hasCourse) &&
+        !(hasStudent && hasCourse) &&
+        keys.every((key) => key === 'student' || key === 'course')
+      );
     };
-    const legacyIndexes = indexes.filter((index) => index.unique && isCourseOnlyIndex(index));
+    const legacyIndexes = indexes.filter((index) => index.unique && isSingleRelationshipIndex(index));
 
     for (const index of legacyIndexes) {
       try {
@@ -26,13 +32,19 @@ async function removeLegacyCourseUniqueIndexes() {
       }
     }
 
-    if (
-      legacyIndexes.length &&
-      !indexes.some((index) => !index.unique && isCourseOnlyIndex(index))
-    ) {
-      await model.collection.createIndex({ course: 1 });
+    if (legacyIndexes.length) {
+      const currentIndexes = await model.collection.indexes();
+      for (const field of ['student', 'course']) {
+        const hasIndex = currentIndexes.some((index) => {
+          const keys = Object.keys(index.key);
+          return keys.length === 1 && index.key[field] === 1;
+        });
+        if (!hasIndex) await model.collection.createIndex({ [field]: 1 });
+      }
     }
+
+    await model.createIndexes();
   }
 }
 
-module.exports = { removeLegacyCourseUniqueIndexes };
+module.exports = { removeLegacyRelationshipUniqueIndexes };

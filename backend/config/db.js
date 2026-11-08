@@ -1,6 +1,6 @@
 
 const mongoose = require('mongoose');
-const { removeLegacyCourseUniqueIndexes } = require('../utils/checkoutIndexMigration');
+const { removeLegacyRelationshipUniqueIndexes } = require('../utils/checkoutIndexMigration');
 
 let memoryServer;
 let connectionPromise = null;
@@ -28,10 +28,12 @@ async function connectDB() {
       }
 
       await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 10000
+        serverSelectionTimeoutMS: 10000,
+        autoIndex: false,
       });
 
-      await removeLegacyCourseUniqueIndexes();
+      await removeLegacyRelationshipUniqueIndexes();
+      await Promise.all(Object.values(mongoose.models).map((model) => model.createIndexes()));
 
       console.log('MongoDB connected.');
 
