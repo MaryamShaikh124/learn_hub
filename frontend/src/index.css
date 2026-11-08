@@ -185,8 +185,8 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .stats-band > div:first-child > .eyebrow { font-size: 12px; }
 .stats-band h2 { margin-bottom: 0; font-size: 36px; }
 .public-stat { min-height: 91px; padding-left: 26px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid var(--border); }
-.public-stat strong { color: var(--purple); font-family: Manrope,sans-serif; font-size: 40px; letter-spacing: -.06em; }
-.public-stat span { margin-top: 3px; color: #828398; font-size: 14px; }
+.public-stat strong { color: var(--purple); font-family: Manrope,sans-serif; font-size: 40px !important; letter-spacing: -.06em; }
+.public-stat span { margin-top: 3px; color: #828398; font-size: 20px; }
 .bottom-cta { position: relative; min-height: 360px; margin-top: 0; padding: 65px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; background: #f0efff; text-align: center; }
 .bottom-cta::before, .bottom-cta::after { position: absolute; width: 250px; height: 250px; border: 1px solid rgba(91,75,219,.1); border-radius: 50%; content: ''; }
 .bottom-cta::before { top: -100px; left: -45px; }
