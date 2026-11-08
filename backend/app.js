@@ -9,11 +9,15 @@ const meta = require('./controllers/metaController');
 
 const app = express();
 
-const clientOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
 
+const clientOrigins = (
+  process.env.CLIENT_URL ||
+  'http://localhost:5173'
+)
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+  
 app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({ origin: clientOrigins, credentials: true }));
