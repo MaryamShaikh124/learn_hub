@@ -357,7 +357,7 @@ h1, h2, h3 { font-family: Manrope, sans-serif; color: var(--navy); letter-spacin
 .status-failed, .status-cancelled { color: #ba5961!important; }
 .payment-result-actions { display: flex; align-items: center; gap: 22px; margin-top: 17px; }
 
-.dashboard-shell { min-height: calc(100vh - 146px); max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 230px minmax(0,1fr); }
+.dashboard-shell { min-height: calc(100vh - 146px); width: 100%; display: grid; grid-template-columns: 230px minmax(0,1fr); }
 .dashboard-sidebar { position: relative; min-height: 100%; padding: 25px 15px 17px; display: flex; flex-direction: column; border-right: 1px solid #e9e9f1; background: #fff; }
 .sidebar-welcome { min-height: 55px; margin-bottom: 27px; padding: 8px; display: flex; align-items: center; gap: 10px; border-radius: 11px; background: #f8f7ff; }
 .sidebar-user-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--purple); background: #eeedff; }
