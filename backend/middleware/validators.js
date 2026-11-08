@@ -30,6 +30,7 @@ const passwordRules = [
 ];
 
 const courseRules = [
+  body('instructorId').optional().isMongoId().withMessage('Choose a valid instructor.'),
   body('title').trim().isLength({ min: 4, max: 140 }).withMessage('Title must be between 4 and 140 characters.'),
   body('shortDescription').trim().isLength({ min: 10, max: 180 }).withMessage('Short description must be between 10 and 180 characters.'),
   body('description').trim().isLength({ min: 20, max: 5000 }).withMessage('Description must be at least 20 characters.'),

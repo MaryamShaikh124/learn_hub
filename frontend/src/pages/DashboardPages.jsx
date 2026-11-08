@@ -190,13 +190,40 @@ export function AdminUsersPage() {
 
 export function AdminCoursesPage() {
   const [courses, setCourses] = useState([]);
+  const [instructors, setInstructors] = useState([]);
   const [query, setQuery] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [courseForm, setCourseForm] = useState(null);
   const [busy, setBusy] = useState(false);
-  useEffect(() => { api.get('/courses/manage/mine').then(({ data }) => setCourses(data.data.courses)).catch((requestError) => setError(getErrorMessage(requestError))).finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    Promise.all([
+      api.get('/courses/manage/mine'),
+      api.get('/admin/users', { params: { role: 'instructor' } }),
+    ])
+      .then(([courseResponse, instructorResponse]) => {
+        setCourses(courseResponse.data.data.courses);
+        setInstructors(instructorResponse.data.data.users.filter((user) => user.isActive));
+      })
+      .catch((requestError) => setError(getErrorMessage(requestError)))
+      .finally(() => setLoading(false));
+  }, []);
   const filtered = courses.filter((course) => `${course.title} ${course.instructor?.name}`.toLowerCase().includes(query.toLowerCase()));
+  const newCourse = () => {
+    setError('');
+    setCourseForm({
+      title: '',
+      shortDescription: '',
+      description: '',
+      category: 'Development',
+      level: 'Beginner',
+      language: 'English',
+      price: 0,
+      thumbnail: '',
+      published: false,
+      instructorId: '',
+    });
+  };
   const deleteCourse = async (course) => {
     if (!window.confirm(`Delete “${course.title}” and its course data? This cannot be undone.`)) return;
     try { await api.delete(`/courses/${course.id}`); setCourses((items) => items.filter((item) => item.id !== course.id)); }
@@ -205,13 +232,19 @@ export function AdminCoursesPage() {
   const saveCourse = async (event) => {
     event.preventDefault(); setBusy(true); setError('');
     try {
-      const { data } = await api.put(`/courses/${courseForm.id}`, courseForm);
-      setCourses((items) => items.map((item) => item.id === courseForm.id ? { ...item, ...data.data.course } : item));
+      const { id, ...payload } = courseForm;
+      if (id) {
+        const { data } = await api.put(`/courses/${id}`, payload);
+        setCourses((items) => items.map((item) => item.id === id ? { ...item, ...data.data.course } : item));
+      } else {
+        const { data } = await api.post('/courses', payload);
+        setCourses((items) => [{ ...data.data.course, enrollmentCount: 0 }, ...items]);
+      }
       setCourseForm(null);
     } catch (requestError) { setError(getErrorMessage(requestError)); }
     finally { setBusy(false); }
   };
-  return <div className="dashboard-page"><PageHeading eyebrow="COURSE OVERSIGHT" title="Courses across LearnHub" description="Review course visibility and help keep the catalog healthy." />{error && <div className="alert alert-error">{error}</div>}<div className="table-toolbar"><label className="search-field"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search course or instructor…" /></label><span className="muted-copy">{courses.length} courses</span></div>{loading ? <Loading /> : filtered.length ? <div className="table-card"><table><thead><tr><th>Course</th><th>Instructor</th><th>Students</th><th>Price</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>{filtered.map((course) => <tr key={course.id}><td><Link className="table-title" to={`/courses/${course.id}`}>{course.title}</Link><small className="table-sub">{course.category}</small></td><td>{course.instructor?.name}</td><td>{course.enrollmentCount || 0}</td><td>{course.price ? `PKR ${Number(course.price).toLocaleString()}` : 'Free'}</td><td><span className={`status-pill ${course.published ? 'published' : ''}`}>{course.published ? 'Published' : 'Draft'}</span></td><td><div className="table-actions"><button className="icon-button" onClick={() => setCourseForm({ ...course })} aria-label={`Edit ${course.title}`}><Pencil size={15} /></button><button className="icon-button danger-icon" onClick={() => deleteCourse(course)} aria-label={`Delete ${course.title}`}><Trash2 size={16} /></button></div></td></tr>)}</tbody></table></div> : <EmptyState title="No matching courses" body="Try a different search term." />}{courseForm && <Modal title="Edit course" onClose={() => setCourseForm(null)}><form className="stack-form" onSubmit={saveCourse}><label>Course title<input required minLength={4} maxLength={140} value={courseForm.title} onChange={(event) => setCourseForm({ ...courseForm, title: event.target.value })} /></label><label>Short description<input required minLength={10} maxLength={180} value={courseForm.shortDescription} onChange={(event) => setCourseForm({ ...courseForm, shortDescription: event.target.value })} /></label><label>Full description<textarea required minLength={20} maxLength={5000} rows="4" value={courseForm.description} onChange={(event) => setCourseForm({ ...courseForm, description: event.target.value })} /></label><div className="form-grid"><label>Category<select value={courseForm.category} onChange={(event) => setCourseForm({ ...courseForm, category: event.target.value })}>{['Development', 'Design', 'Business', 'Data Science', 'Marketing', 'Photography'].map((item) => <option key={item}>{item}</option>)}</select></label><label>Level<select value={courseForm.level} onChange={(event) => setCourseForm({ ...courseForm, level: event.target.value })}>{['Beginner', 'Intermediate', 'Advanced'].map((item) => <option key={item}>{item}</option>)}</select></label><label>Price (PKR)<input type="number" min="0" max="1000000" step="1" value={courseForm.price} onChange={(event) => setCourseForm({ ...courseForm, price: Number(event.target.value) })} /></label><label>Language<input maxLength={40} value={courseForm.language} onChange={(event) => setCourseForm({ ...courseForm, language: event.target.value })} /></label></div><label>Thumbnail image URL<input type="url" value={courseForm.thumbnail || ''} onChange={(event) => setCourseForm({ ...courseForm, thumbnail: event.target.value })} /></label><label className="checkbox-label"><input type="checkbox" checked={Boolean(courseForm.published)} onChange={(event) => setCourseForm({ ...courseForm, published: event.target.checked })} /> Published in the public catalog</label><div className="modal-actions"><Button type="button" variant="outline" onClick={() => setCourseForm(null)}>Cancel</Button><Button disabled={busy}>{busy ? 'Saving…' : 'Save changes'} <Check size={15} /></Button></div></form></Modal>}</div>;
+  return <div className="dashboard-page"><PageHeading eyebrow="COURSE OVERSIGHT" title="Courses across LearnHub" description="Review course visibility and create courses for instructors." action={<Button onClick={newCourse}><Plus size={17} /> Add course</Button>} />{error && <div className="alert alert-error">{error}</div>}<div className="table-toolbar"><label className="search-field"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search course or instructor…" /></label><span className="muted-copy">{courses.length} courses</span></div>{loading ? <Loading /> : filtered.length ? <div className="table-card"><table><thead><tr><th>Course</th><th>Instructor</th><th>Students</th><th>Price</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>{filtered.map((course) => <tr key={course.id}><td><Link className="table-title" to={`/courses/${course.id}`}>{course.title}</Link><small className="table-sub">{course.category}</small></td><td>{course.instructor?.name}</td><td>{course.enrollmentCount || 0}</td><td>{course.price ? `PKR ${Number(course.price).toLocaleString()}` : 'Free'}</td><td><span className={`status-pill ${course.published ? 'published' : ''}`}>{course.published ? 'Published' : 'Draft'}</span></td><td><div className="table-actions"><button className="icon-button" onClick={() => setCourseForm({ ...course })} aria-label={`Edit ${course.title}`}><Pencil size={15} /></button><button className="icon-button danger-icon" onClick={() => deleteCourse(course)} aria-label={`Delete ${course.title}`}><Trash2 size={16} /></button></div></td></tr>)}</tbody></table></div> : <EmptyState title="No matching courses" body="Try a different search term." />}{courseForm && <Modal title={courseForm.id ? 'Edit course' : 'Add course'} onClose={() => setCourseForm(null)}><form className="stack-form" onSubmit={saveCourse}><label>Course title<input required minLength={4} maxLength={140} value={courseForm.title} onChange={(event) => setCourseForm({ ...courseForm, title: event.target.value })} /></label><label>Short description<input required minLength={10} maxLength={180} value={courseForm.shortDescription} onChange={(event) => setCourseForm({ ...courseForm, shortDescription: event.target.value })} /></label><label>Full description<textarea required minLength={20} maxLength={5000} rows="4" value={courseForm.description} onChange={(event) => setCourseForm({ ...courseForm, description: event.target.value })} /></label><div className="form-grid"><label>Category<select value={courseForm.category} onChange={(event) => setCourseForm({ ...courseForm, category: event.target.value })}>{['Development', 'Design', 'Business', 'Data Science', 'Marketing', 'Photography'].map((item) => <option key={item}>{item}</option>)}</select></label><label>Level<select value={courseForm.level} onChange={(event) => setCourseForm({ ...courseForm, level: event.target.value })}>{['Beginner', 'Intermediate', 'Advanced'].map((item) => <option key={item}>{item}</option>)}</select></label><label>Price (PKR)<input type="number" min="0" max="1000000" step="1" value={courseForm.price} onChange={(event) => setCourseForm({ ...courseForm, price: Number(event.target.value) })} /></label><label>Language<input maxLength={40} value={courseForm.language} onChange={(event) => setCourseForm({ ...courseForm, language: event.target.value })} /></label></div>{!courseForm.id && <label>Instructor<select value={courseForm.instructorId} onChange={(event) => setCourseForm({ ...courseForm, instructorId: event.target.value })}><option value="">Assign to me (admin)</option>{instructors.map((instructor) => <option key={instructor.id} value={instructor.id}>{instructor.name} — {instructor.email}</option>)}</select></label>}<label>Thumbnail image URL<input type="url" value={courseForm.thumbnail || ''} onChange={(event) => setCourseForm({ ...courseForm, thumbnail: event.target.value })} /></label><label className="checkbox-label"><input type="checkbox" checked={Boolean(courseForm.published)} onChange={(event) => setCourseForm({ ...courseForm, published: event.target.checked })} /> Published in the public catalog</label><div className="modal-actions"><Button type="button" variant="outline" onClick={() => setCourseForm(null)}>Cancel</Button><Button disabled={busy}>{busy ? 'Saving…' : courseForm.id ? 'Save changes' : 'Create course'} <Check size={15} /></Button></div></form></Modal>}</div>;
 }
 
 export function ProfilePage() {

@@ -759,8 +759,8 @@ td b { color: #464862; font-size: 9px; }
 }
 .site-header :is(.main-nav a, .login-link, .text-button),
 .site-footer :is(p, span),
-.site-main :is(.eyebrow, p, a:not(.brand), button, label, input, select, textarea, small, th, td, .course-meta, .course-instructor, .course-description, .course-category, .stat-label, .status-pill, .table-sub, .table-title, .breadcrumbs, .detail-tags span, .detail-byline, .detail-facts, .purchase-guarantees, .curriculum-total, .lesson-row-title, .auth-role-note, .auth-subtitle, .auth-switch, .review-form label, .instructor-card > p, .aside-note p, .activity-row, .managed-course-meta, .managed-course-copy > p, .managed-course-stats, .learning-row-top p, .learning-row-bottom, .certificate-card > p, .certificate-card-footer, .lesson-sidebar-header p, .lesson-nav-copy, .lesson-stage-bottom p) {
-  font-size: max(11px, .75em);
+.site-main :is(.eyebrow, p, a:not(.brand), button, label, input, select, textarea, small, th, td, b, strong, .course-meta, .course-instructor, .course-description, .course-category, .stat-label, .status-pill, .table-sub, .table-title, .breadcrumbs, .detail-tags span, .detail-byline, .detail-facts, .purchase-guarantees, .curriculum-total, .lesson-row-title, .auth-role-note, .auth-subtitle, .auth-switch, .review-form label, .instructor-card > p, .aside-note p, .activity-row, .managed-course-meta, .managed-course-copy > p, .managed-course-stats, .learning-row-top p, .learning-row-bottom, .certificate-card > p, .certificate-card-footer, .lesson-sidebar-header p, .lesson-nav-copy, .lesson-stage-bottom p) {
+  font-size: max(13px, .8em);
 }
 @media print {
   body { background: white; }

@@ -98,6 +98,60 @@ test('public course listing returns the expected empty catalog shape', async () 
   assert.equal(response.body.data.page, 1);
 });
 
+test('admins can create courses for active instructors and cannot assign other roles', async () => {
+  const admin = await User.create({
+    name: 'Course Admin',
+    email: 'course.admin@example.test',
+    password: 'a-secure-password',
+    role: 'admin',
+  });
+  const instructor = await User.create({
+    name: 'Course Instructor',
+    email: 'assigned.instructor@example.test',
+    password: 'a-secure-password',
+    role: 'instructor',
+  });
+  const student = await User.create({
+    name: 'Course Student',
+    email: 'course.student@example.test',
+    password: 'a-secure-password',
+  });
+  const login = await request(app)
+    .post('/api/auth/login')
+    .send({ email: admin.email, password: 'a-secure-password' })
+    .expect(200);
+  const token = login.body.data.token;
+  const courseDetails = {
+    title: 'Admin Created Course',
+    shortDescription: 'A practical course created by an administrator.',
+    description: 'Learn useful skills in this course through practical examples and guided exercises.',
+    category: 'Development',
+    level: 'Beginner',
+    price: 0,
+    instructorId: instructor.id,
+  };
+
+  const response = await request(app)
+    .post('/api/courses')
+    .set('Authorization', `Bearer ${token}`)
+    .send(courseDetails)
+    .expect(201);
+  assert.equal(response.body.data.course.instructor.id, String(instructor._id));
+  assert.equal(await Course.countDocuments({ instructor: instructor._id }), 1);
+
+  await request(app)
+    .post('/api/courses')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ ...courseDetails, title: 'Invalid Instructor Course', instructorId: student.id })
+    .expect(400);
+
+  await request(app)
+    .post('/api/courses')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ ...courseDetails, title: 'Malformed Instructor Course', instructorId: 'not-an-id' })
+    .expect(400);
+});
+
 test('free enrollment tracks lesson completion and issues a certificate', async () => {
   const registration = await request(app)
     .post('/api/auth/register')

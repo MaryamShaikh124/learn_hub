@@ -3,6 +3,7 @@ const Lesson = require('../models/Lesson');
 const Enrollment = require('../models/Enrollment');
 const Review = require('../models/Review');
 const Certificate = require('../models/Certificate');
+const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { slugify } = require('../utils/slug');
@@ -134,6 +135,17 @@ const getCourse = asyncHandler(async (req, res) => {
 });
 
 const createCourse = asyncHandler(async (req, res) => {
+  let instructor = req.user._id;
+  if (req.user.role === 'admin' && req.body.instructorId) {
+    const assignedInstructor = await User.findOne({
+      _id: req.body.instructorId,
+      role: 'instructor',
+      isActive: true,
+    });
+    if (!assignedInstructor) throw new AppError('Choose an active instructor account.', 400);
+    instructor = assignedInstructor._id;
+  }
+
   const course = await Course.create({
     title: req.body.title,
     slug: slugify(req.body.title),
@@ -144,7 +156,7 @@ const createCourse = asyncHandler(async (req, res) => {
     language: req.body.language || 'English',
     price: Math.round(Number(req.body.price)),
     thumbnail: req.body.thumbnail || '',
-    instructor: req.user.role === 'admin' && req.body.instructorId ? req.body.instructorId : req.user._id,
+    instructor,
     published: Boolean(req.body.published),
   });
   const populated = await course.populate('instructor', 'name headline bio');
