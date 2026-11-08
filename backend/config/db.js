@@ -1,20 +1,45 @@
+
 const mongoose = require('mongoose');
 
 let memoryServer;
+let connectionPromise = null;
 
 async function connectDB() {
-  let uri = process.env.MONGODB_URI;
-  if (!uri) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('MONGODB_URI is required in production.');
-    }
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    memoryServer = await MongoMemoryServer.create();
-    uri = memoryServer.getUri();
-    console.log('MONGODB_URI is empty. Using an in-memory database that resets when the API stops.');
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
   }
-  await mongoose.connect(uri);
-  console.log('MongoDB connected.');
+
+  if (!connectionPromise) {
+    connectionPromise = (async () => {
+      let uri = process.env.MONGODB_URI;
+
+      if (!uri) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('MONGODB_URI is required in production.');
+        }
+
+        const { MongoMemoryServer } = require('mongodb-memory-server');
+
+        memoryServer = await MongoMemoryServer.create();
+        uri = memoryServer.getUri();
+
+        console.log('Using temporary in-memory MongoDB.');
+      }
+
+      await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 10000
+      });
+
+      console.log('MongoDB connected.');
+
+      return mongoose.connection;
+    })().catch((error) => {
+      connectionPromise = null;
+      throw error;
+    });
+  }
+
+  return connectionPromise;
 }
 
 module.exports = { connectDB };
